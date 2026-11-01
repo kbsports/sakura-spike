@@ -135,7 +135,7 @@ textarea{min-height:70px;resize:vertical}
 
     <div class="card">
       <h2><span class="num">4</span>刺繍</h2>
-      <p class="hint">入れたい場所だけ「入れる」にしてください。桜吹雪は1か所につき3,300円（税込）かかります。</p>
+      <p class="hint">入れたい場所だけ「入れる」にしてください。桜吹雪は1か所につき6,600円（税込）かかります。</p>
       <div id="embList"></div>
     </div>
 
@@ -340,14 +340,14 @@ const OPTS = {
   size:['24.0','24.5','25.0','25.5','26.0','26.5','27.0','27.5','28.0','28.5','29.0'].map(v=>[v,v]),
   field:['社会人','大学','高校','中学','小学','ソフト'].map(v=>[v,v]),
   tongueLogo:[['none','なし'],['emb','桜ロゴ刺繍（+6,600円）'],['patch','ワッペン縫い付け（+3,300円）']],
-  pleather:[['none','なし'],['yes','あり（+3,000円）']],
+  pleather:[['none','なし'],['yes','あり（+3,300円）']],
   sns:[['ok','OK'],['no','NO']]
 };
 const FONTS = ['ローマ字活字体','筆記体','ブラッシュ体','オールドイングリッシュ体','漢字'];
 const EMB_PLACES = [['tongue1','ベロ部'],['tongue2','ベロ部2段目'],['heel','カカト部'],['other1','その他①'],['other2','その他②']];
 
 /* 金額はすべて税込 */
-const PRICE = {base:25000, emb:3000, pleather:3000, tongueEmb:6600, tonguePatch:3300, sakura:3300};
+const PRICE = {base:27500, emb:3000, pleather:3300, tongueEmb:6600, tonguePatch:3300, sakura:6600};
 
 /* ===== 状態 ===== */
 function defaults(){
@@ -551,7 +551,7 @@ function buildEmb(){
           <div class="row"><div class="lbl">刺繍カラー</div><div class="c-main"></div></div>
           <div class="row"><div class="lbl">カゲ</div><div class="c-kage"></div></div>
           <div class="row"><div class="lbl">フチ</div><div class="c-fuchi"></div></div>
-          <div class="row"><div class="lbl">桜吹雪</div><div class="seg c-sakura"><button type="button" data-v="0">なし</button><button type="button" data-v="1">あり（+3,300円）</button></div></div>
+          <div class="row"><div class="lbl">桜吹雪</div><div class="seg c-sakura"><button type="button" data-v="0">なし</button><button type="button" data-v="1">あり（+6,600円）</button></div></div>
         </div>`;
       d.querySelectorAll('.emb-head button').forEach(b=>b.addEventListener('click',()=>{ S.emb[k].on = b.dataset.on==='1'; refresh(); }));
       d.querySelector('select').addEventListener('change',ev=>{ S.emb[k].font=ev.target.value; refreshText(); });
