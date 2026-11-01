@@ -88,6 +88,9 @@ textarea{min-height:70px;resize:vertical}
 .modal-ft.busy{opacity:.6;pointer-events:none}
 .receipt{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-align:center;margin:8px 0}
 .req{color:var(--accent);font-size:11px;margin-left:4px}
+.opt{color:#fff;background:#8a8d91;border-radius:4px;font-size:10.5px;padding:0 5px;margin-left:5px;font-weight:600;white-space:nowrap;display:inline-block}
+.mail-help{margin:6px 0 0;font-size:12.5px;color:#7a4b00;background:#fff7e0;border:1px solid #f1d58a;border-radius:8px;padding:6px 9px;line-height:1.55}
+.mail-help b{color:#5a3700}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Great+Vibes&family=Kaushan+Script&family=UnifrakturMaguntia&family=Yuji+Syuku&display=swap" rel="stylesheet">
@@ -144,9 +147,11 @@ textarea{min-height:70px;resize:vertical}
     <div class="card">
       <h2><span class="num">5</span>お客様情報</h2>
       <div class="row"><label for="f_name">氏名<span class="req">必須</span></label><input id="f_name" type="text" autocomplete="name"></div>
+      <div class="row"><label for="f_zip">郵便番号<span class="req">必須</span></label><input id="f_zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="例：123-4567" style="max-width:180px"></div>
       <div class="row"><label for="f_addr">ご住所<span class="req">必須</span></label><input id="f_addr" type="text" autocomplete="street-address"></div>
       <div class="row"><label for="f_tel">お電話番号<span class="req">必須</span></label><input id="f_tel" type="tel" autocomplete="tel"></div>
-      <div class="row"><label for="f_mail">E-mail</label><input id="f_mail" type="email" autocomplete="email"></div>
+      <div class="row"><label for="f_mail">メールアドレス<span class="opt">任意</span></label><div><input id="f_mail" type="email" autocomplete="email" placeholder="例：sakura@example.com">
+        <p class="mail-help">📧 <b>ご注文後のご連絡（確認・お見積り・発送のお知らせなど）はメールでお送りします。</b>ご入力がない場合は、お電話でのご連絡になります。</p></div></div>
       <div class="row"><label for="f_line">LINE ID（任意）</label><input id="f_line" type="text"></div>
       <div class="row"><label for="f_team">所属チーム名（任意）</label><input id="f_team" type="text"></div>
       <div class="row"><div class="lbl">SNSへの掲載</div><div class="seg" data-key="sns"></div></div>
@@ -940,9 +945,10 @@ function orderText(){
   L.push('');
   L.push('■ お客様情報');
   L.push(`氏名：${v('f_name')} 様`);
+  L.push(`郵便番号：${v('f_zip')}`);
   L.push(`ご住所：${v('f_addr')}`);
   L.push(`お電話番号：${v('f_tel')}`);
-  L.push(`E-mail：${v('f_mail')}`);
+  L.push(`メールアドレス：${v('f_mail')||'（未入力・お電話でのご連絡）'}`);
   if(v('f_line')) L.push(`LINE ID：${v('f_line')}`);
   if(v('f_team')) L.push(`所属チーム名：${v('f_team')}`);
   L.push(`SNSへの掲載：${label('sns',S.sns)}`);
@@ -998,10 +1004,10 @@ $('btnImg').addEventListener('click',()=>{
 $('btnReset').addEventListener('click',()=>{
   if(!confirm('選んだ内容をすべて最初に戻します。よろしいですか？')) return;
   S=defaults(); $('embList').innerHTML='';
-  ['f_name','f_addr','f_tel','f_mail','f_line','f_team','f_memo'].forEach(id=>$(id).value='');
+  ['f_name','f_zip','f_addr','f_tel','f_mail','f_line','f_team','f_memo'].forEach(id=>$(id).value='');
   refresh();
 });
-['f_name','f_addr','f_tel','f_mail','f_line','f_team','f_memo'].forEach(id=>$(id).addEventListener('input',refreshText));
+['f_name','f_zip','f_addr','f_tel','f_mail','f_line','f_team','f_memo'].forEach(id=>$(id).addEventListener('input',refreshText));
 
 /* ===== 注文確定 → Formspree送信 ＋ 控えPDF ===== */
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwvglbpn';   // 桜グラブと同じKBスポーツ用
@@ -1009,7 +1015,7 @@ function genReceiptNo(){
   const d=new Date(), p=n=>String(n).padStart(2,'0');
   return `KB-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
 }
-function custInfo(){ const v=id=>$(id).value.trim(); return {name:v('f_name'),addr:v('f_addr'),tel:v('f_tel'),mail:v('f_mail')}; }
+function custInfo(){ const v=id=>$(id).value.trim(); return {name:v('f_name'),zip:v('f_zip'),addr:v('f_addr'),tel:v('f_tel'),mail:v('f_mail')}; }
 // 配色の復元コード（受付番号からKBが配色を再現できるように）
 // 初期値から変わった所だけを、URLにそのまま使える文字（- _）で短くする。メールでリンクとして押せるように
 function diffObj(a,d){ const o={}; Object.keys(a).forEach(k=>{ const v=a[k], dv=d?d[k]:undefined;
@@ -1024,15 +1030,29 @@ function decodeState(code){
   try{ let b=String(code).trim().replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='=';
     return mergeObj(defaults(), JSON.parse(decodeURIComponent(escape(atob(b))))); }catch(e){ return null; } }
 let _last=null;
+function showMailAsk(){
+  const m=$('confirm-modal');
+  m.innerHTML='<div class="modal-hd"><h2>📧 メールアドレスが未入力です</h2></div>'+
+    '<div class="modal-bd"><p style="font-size:14px;line-height:1.7">ご注文後のご連絡（確認・お見積り・発送のお知らせなど）は、<b>メールでお送りしています。</b><br>メールアドレスがない場合は、お電話でのご連絡になります。<br>できるだけメールアドレスのご入力をお願いします。</p></div>'+
+    '<div class="modal-ft"><button class="btn sub" id="mNoMail">入力せずに進む（お電話で連絡）</button><button class="btn main" id="mInputMail">メールアドレスを入力する</button></div>';
+  $('mInputMail').onclick=()=>{ $('confirm-ov').classList.remove('show'); const f=$('f_mail'); f.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>f.focus(),400); };
+  $('mNoMail').onclick=()=>{ openConfirm._mailOk=true; openConfirm(); };
+  $('confirm-ov').classList.add('show');
+}
 function openConfirm(){
   const c=custInfo(), miss=[];
   if(!S.size) miss.push('サイズ');
-  if(!c.name) miss.push('氏名'); if(!c.addr) miss.push('ご住所'); if(!c.tel) miss.push('お電話番号');
+  if(!c.name) miss.push('氏名'); if(!c.zip) miss.push('郵便番号'); if(!c.addr) miss.push('ご住所'); if(!c.tel) miss.push('お電話番号');
   if(miss.length){
     alert(miss.join('・')+'を入力・選択してください。');
     (S.size?$('f_name'):document.querySelector('[data-key=size]')).scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
+  // メールアドレスは任意。ただし空のときは一度だけ確認して、入力をおすすめする
+  if(!c.mail && !openConfirm._mailOk){
+    showMailAsk(); return;
+  }
+  openConfirm._mailOk=false;
   const m=$('confirm-modal');
   m.innerHTML='<div class="modal-hd"><h2>🌸 ご注文内容の最終確認</h2><p>内容をご確認のうえ、よろしければ確定してください。</p></div>'+
     '<div class="modal-bd"><pre id="confirm-text"></pre><div class="modal-note">「この内容で確定・送信する」を押すと、KBスポーツへ送信され、受付番号が発行されます。そのあと注文控えのPDFを保存できます。</div></div>'+
@@ -1050,7 +1070,7 @@ async function submitOrder(){
   let sent=false;
   try{
     const res=await fetch(FORMSPREE_ENDPOINT,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},
-      body:JSON.stringify({受付番号:no,商品:'桜スパイクSECOND',氏名:c.name,住所:c.addr,電話番号:c.tel,メールアドレス:c.mail,
+      body:JSON.stringify({受付番号:no,商品:'桜スパイクSECOND',氏名:c.name,郵便番号:c.zip,住所:c.addr,電話番号:c.tel,メールアドレス:c.mail||'（未入力・お電話でのご連絡）',
         注文内容:text,配色復元リンク:url,配色復元コード:code,_subject:`【桜スパイクSECOND注文】受付番号 ${no}`})});
     sent=res.ok;
   }catch(e){ sent=false; }
