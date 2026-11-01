@@ -135,7 +135,7 @@ textarea{min-height:70px;resize:vertical}
 
     <div class="card">
       <h2><span class="num">4</span>刺繍</h2>
-      <p class="hint">入れたい場所だけ「入れる」にしてください。桜吹雪は1か所につき6,600円（税込）かかります。</p>
+      <p class="hint">入れたい場所だけ「入れる」にしてください。刺繍は1か所につき3,300円（税込）です。桜吹雪を付ける場合は、さらに1か所につき6,600円（税込）かかります。</p>
       <div id="embList"></div>
     </div>
 
@@ -605,7 +605,8 @@ function specChips(){
 function priceRows(){
   const rows=[], yen=n=>n.toLocaleString('ja-JP')+'円';
   rows.push(['基本料金', PRICE.base]);
-  if(EMB_PLACES.some(([k])=>S.emb[k].on)) rows.push(['刺繍料金', PRICE.emb]);
+  const embN = EMB_PLACES.filter(([k])=>S.emb[k].on).length;   // 刺繍は1か所ごとに料金がかかる
+  if(embN) rows.push([`刺繍料金 ×${embN}か所`, PRICE.emb*embN]);
   if(S.pleather==='yes') rows.push(['P革料金', PRICE.pleather]);
   if(S.tongueLogo==='emb') rows.push(['ベロ 桜ロゴ刺繍', PRICE.tongueEmb]);
   if(S.tongueLogo==='patch') rows.push(['ベロ ワッペン縫い付け', PRICE.tonguePatch]);
