@@ -594,7 +594,7 @@ const SOLE_COLOR = '#FFFFFF';
 const OPTS = {
   height:[['low','ロー'],['mid','ミドル'],['quarter','クォーター（26.0〜）']],
   closure:[['lace','ひもタイプ'],['belt','ベルトタイプ']],
-  sole:[['metal','金具（樹脂底金属歯EVA）'],['point','ポイント'],['up','トレシュー']],
+  sole:[['metal','金具（樹脂底金属歯EVA）'],['point','ポイント'],['up','アップシューズ']],
   material:Object.keys(MATERIAL_COLORS).map(m=>[m,m]),
   tongueType:[['stand','立ちベロ'],['fold','折りベロ']],
   size:['24.0','24.5','25.0','25.5','26.0','26.5','27.0','27.5','28.0','28.5','29.0'].map(v=>[v,v]),
@@ -869,7 +869,7 @@ function syncSegs(){
       if(key==='tongueLogo' && b.dataset.v!=='none' && TONGUE_EMB.some(t=>S.emb[t].on)) dis=true;   // ベロ部に刺繍を入れたらベロのロゴは不可
       if(key==='size'){
         const v=parseFloat(b.dataset.v);
-        if(v<25.5 && S.sole==='metal') dis=true;          // 24.0〜はトレシュー・ポイントのみ
+        if(v<25.5 && S.sole==='metal') dis=true;          // 24.0〜はアップシューズ・ポイントのみ
         if(v<26 && S.height==='quarter') dis=true;        // クォーターは26.0〜
       }
       b.disabled=dis;
